@@ -161,7 +161,11 @@ class syntax_plugin_translationbuddy extends DokuWiki_Syntax_Plugin {
                 $idx = ($ns=='-' ? ($lc=='en'?'-1':$lc) : ($lc=='en'?'':$lc.':').$ns);
                 $R->doc .= '<td><a href="'.wl($ID,'idx='.rawurlencode($idx)).'" >'.$ns.'</a></td>';
                 $R->doc .= '<td class="rightalign">'.count($pages).'</td>';
-                $R->doc .= '<td class="rightalign">'.round(100*count($pages)/count($items['en'][$ns])).'%</td>';
+                if (count($items['en'][$ns]) == 0) {
+                    $R->doc .= '<td class="rightalign"> - </td>';
+                } else {
+                    $R->doc .= '<td class="rightalign">'.round(100*count($pages)/count($items['en'][$ns])).'%</td>';
+                }
 
                 $R->doc .= '<td>';
                 // outdated
@@ -183,23 +187,24 @@ class syntax_plugin_translationbuddy extends DokuWiki_Syntax_Plugin {
                     $R->doc .= '<br/> ';
                 }
                 // rouge pages
-                $extra_pages = array_keys(array_diff_key($pages,$items['en'][$ns]));
-                $func = create_function('$id' , "return '<a href=\"'.wl('$lc:'.\$id).'\">'.\$id.'</a>';");
-                if (count($extra_pages) > 0) {
-                    $extra_pages = array_map($func, $extra_pages);
-                    $R->doc .= '<b>Rogue pages:</b><br/> '.implode(', ', $extra_pages).'<br/>';
+                if (count($items['en'][$ns]) > 0) {
+                    $extra_pages = array_keys(array_diff_key($pages,$items['en'][$ns]));
+                    $func = create_function('$id' , "return '<a href=\"'.wl('$lc:'.\$id).'\">'.\$id.'</a>';");
+                    if (count($extra_pages) > 0) {
+                        $extra_pages = array_map($func, $extra_pages);
+                        $R->doc .= '<b>Rogue pages:</b><br/> '.implode(', ', $extra_pages).'<br/>';
+                    }
                 }
 
                 $R->doc .= '</td>';
                 $R->doc .= '</tr>';
                 $pageTotal += count($pages);
             }
-            if ($lc == 'en') $englishTotal = $pageTotal;
             $R->doc .= '<tr>';
-            $R->doc .= '<th></th>';
+            $R->doc .= '<th>'.$lc.'</th>';
             $R->doc .= '<th>Total</th>';
-            $R->doc .= '<th>'.$pageTotal.'</th>';
-            $R->doc .= '<th>'.round(100*$pageTotal/$englishTotal).'%</th>';
+            $R->doc .= '<th class="rightalign">'.$pageTotal.'</th>';
+            $R->doc .= '<th></th>';
             $R->doc .= '<th></th>';
             $R->doc .= '</tr>';
         }
