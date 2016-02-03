@@ -32,11 +32,11 @@ class syntax_plugin_translationbuddy extends DokuWiki_Syntax_Plugin {
         $this->Lexer->addSpecialPattern('----+ *translationbuddy *-+\n.*?\n----+',$mode,'plugin_translationbuddy');
         }
 
-    public function handle($match, $state, $pos, &$handler){
+    public function handle($match, $state, $pos, Doku_Handler $handler){
         return $this->parseData($match);
     }
 
-    public function render($mode, &$renderer, $data) {
+    public function render($mode, Doku_Renderer $renderer, $data) {
         if($mode == 'xhtml') {
             return $this->_showData($renderer,$data);
         }
